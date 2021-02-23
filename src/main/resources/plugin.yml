@@ -1,0 +1,17 @@
+name: frConomy
+version: 1.13a
+api-version: 1.13
+main: ro.fr33styler.frconomy.FrConomy
+author: Fr33styler
+softdepend: [Vault]
+load: STARTUP
+commands:
+  money:
+    description: Show money.
+    aliases: [bal]
+  pay:
+    description: Pay money.
+  baltop:
+    description: Show top users.
+  eco:
+    description: Admin money management.
