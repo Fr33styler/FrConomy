@@ -11,6 +11,7 @@ mysql:
   port: 3306
   username: Fr33styler
   password: '12345'
+  table: frConomy
   properties:
     useSSL: true
     trustServerCertificate: true

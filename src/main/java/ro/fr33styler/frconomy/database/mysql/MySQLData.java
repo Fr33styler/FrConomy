@@ -9,12 +9,14 @@ public class MySQLData {
     private final String host;
     private final String database;
     private final int port;
+    private final String table;
     private final Properties properties = new Properties();
 
     public MySQLData(ConfigurationSection section) {
         host = section.getString("host");
         database = section.getString("database");
         port = section.getInt("port");
+        table = section.getString("table");
 
         properties.clear();
         properties.put("user", section.getString("username"));
@@ -37,6 +39,10 @@ public class MySQLData {
 
     public int getPort() {
         return port;
+    }
+
+    public String getTable() {
+        return table;
     }
 
     public Properties getProperties() {

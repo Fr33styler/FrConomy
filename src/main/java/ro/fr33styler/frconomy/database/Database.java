@@ -13,19 +13,21 @@ public abstract class Database {
 
     private final Connection connection;
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
+    private final String table;
 
-    protected Database(Connection connection) {
+    protected Database(Connection connection, String table) {
         this.connection = connection;
+        this.table = table;
     }
 
     public void createTable() throws SQLException {
         try (Statement statement = connection.createStatement()) {
-            statement.executeUpdate("CREATE TABLE IF NOT EXISTS frConomy (UUID VARCHAR(36) UNIQUE, NAME VARCHAR(60), BALANCE DOUBLE(64,2));");
+            statement.executeUpdate("CREATE TABLE IF NOT EXISTS " + table + " (UUID VARCHAR(36) UNIQUE, NAME VARCHAR(60), BALANCE DOUBLE(64,2));");
         }
     }
 
     public boolean createAccount(Account account) {
-        try (PreparedStatement statement = connection.prepareStatement("INSERT INTO frConomy VALUES (?, ?, ?);")) {
+        try (PreparedStatement statement = connection.prepareStatement("INSERT INTO " + table + " VALUES (?, ?, ?);")) {
             statement.setString(1, account.getUUID().toString());
             statement.setString(2, account.getName());
             statement.setDouble(3, account.getBalance());
@@ -38,7 +40,7 @@ public abstract class Database {
     }
 
     public boolean hasAccount(Account account) {
-        try (PreparedStatement statement = connection.prepareStatement("SELECT UUID, BALANCE FROM frConomy WHERE UUID = ? LIMIT 1;")) {
+        try (PreparedStatement statement = connection.prepareStatement("SELECT UUID, BALANCE FROM " + table + " WHERE UUID = ? LIMIT 1;")) {
             statement.setString(1, account.getUUID().toString());
             try (ResultSet result = statement.executeQuery()) {
                 return result.next();
@@ -50,7 +52,7 @@ public abstract class Database {
     }
 
     public void updateAccount(Account account) {
-        try (PreparedStatement statement = connection.prepareStatement("UPDATE frConomy SET UUID = ?, NAME = ?, BALANCE = ? WHERE UUID = ?;")) {
+        try (PreparedStatement statement = connection.prepareStatement("UPDATE " + table + " SET UUID = ?, NAME = ?, BALANCE = ? WHERE UUID = ?;")) {
             statement.setString(1, account.getUUID().toString());
             statement.setString(2, account.getName());
             statement.setDouble(3, account.getBalance());
@@ -66,7 +68,7 @@ public abstract class Database {
     }
 
     public void getAccount(Account account, Runnable ifFailed) {
-        try (PreparedStatement statement = connection.prepareStatement("SELECT BALANCE FROM frConomy WHERE UUID = ? LIMIT 1;")) {
+        try (PreparedStatement statement = connection.prepareStatement("SELECT BALANCE FROM " + table + " WHERE UUID = ? LIMIT 1;")) {
             statement.setString(1, account.getUUID().toString());
             try (ResultSet result = statement.executeQuery()) {
                 if (result.next()) {
@@ -82,7 +84,7 @@ public abstract class Database {
 
     public void getTopAsync(int position, Top consumer) {
         executor.execute(() -> {
-            try (PreparedStatement statement = connection.prepareStatement("SELECT NAME, BALANCE FROM frConomy ORDER BY BALANCE DESC;")) {
+            try (PreparedStatement statement = connection.prepareStatement("SELECT NAME, BALANCE FROM " + table + " ORDER BY BALANCE DESC;")) {
                 try (ResultSet result = statement.executeQuery()) {
                     double congregatedBalances = 0;
                     List<Account> top = new ArrayList<>(10);
