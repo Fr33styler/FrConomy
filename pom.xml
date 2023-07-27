@@ -63,7 +63,6 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <finalName>${plugin.finalName}</finalName>
                     <relocations>
                         <relocation>
                             <pattern>org.bstats.</pattern>
