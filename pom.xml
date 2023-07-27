@@ -6,13 +6,14 @@
 
     <groupId>ro.fr33styler.minecraft</groupId>
     <artifactId>frConomy</artifactId>
-    <version>1.14</version>
+    <version>1.14a</version>
 
     <properties>
         <plugin.name>FrConomy</plugin.name>
         <plugin.finalName>${plugin.name}-${project.version}</plugin.finalName>
 
-        <plugin.main.classpath>ro.fr33styler.frconomy.FrConomy</plugin.main.classpath>
+        <plugin.main.path>ro.fr33styler.frconomy</plugin.main.path>
+        <plugin.main.classpath>${plugin.main.path}.FrConomy</plugin.main.classpath>
 
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
@@ -49,6 +50,31 @@
                     </archive>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.5.0</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <finalName>${plugin.finalName}</finalName>
+                    <relocations>
+                        <relocation>
+                            <pattern>org.bstats.</pattern>
+                            <shadedPattern>${plugin.main.path}.metrics.</shadedPattern>
+                        </relocation>
+                    </relocations>
+                    <minimizeJar>true</minimizeJar>
+                    <createDependencyReducedPom>false</createDependencyReducedPom>
+                </configuration>
+
+            </plugin>
         </plugins>
     </build>
 
@@ -64,6 +90,12 @@
             <artifactId>VaultAPI</artifactId>
             <version>1.7</version>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.bstats</groupId>
+            <artifactId>bstats-bukkit</artifactId>
+            <version>3.0.2</version>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 

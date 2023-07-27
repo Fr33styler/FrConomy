@@ -1,6 +1,7 @@
 package ro.fr33styler.frconomy;
 
 import net.milkbowl.vault.economy.Economy;
+import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.command.PluginCommand;
@@ -29,6 +30,7 @@ public class FrConomy extends JavaPlugin {
     private Settings settings;
     private Messages messages;
     private VaultHook vaultHook;
+    private Metrics metrics;
     private final Accounts accounts = new Accounts(this);
     private final Formatter formatter = new Formatter(this);
 
@@ -55,6 +57,9 @@ public class FrConomy extends JavaPlugin {
         console.sendMessage("§a - Hooking into Vault...");
         getServer().getServicesManager().register(Economy.class, vaultHook = new VaultHook(this), this, ServicePriority.High);
 
+        console.sendMessage("§a - Loading metrics...");
+        metrics = new Metrics(this, 19272);
+
         console.sendMessage("§a - Loading events...");
         getServer().getPluginManager().registerEvents(new SessionEvents(this), this);
 
@@ -71,6 +76,7 @@ public class FrConomy extends JavaPlugin {
 
     public void onDisable() {
         if (database != null) {
+            metrics.shutdown();
             Bukkit.getOnlinePlayers().forEach(accounts::remove);
 
             getServer().getServicesManager().unregister(vaultHook);
