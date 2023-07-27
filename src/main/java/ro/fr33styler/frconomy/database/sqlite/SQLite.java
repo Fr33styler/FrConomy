@@ -9,7 +9,7 @@ import java.sql.SQLException;
 public class SQLite extends Database {
 
     public SQLite(File dataFolder) throws SQLException {
-        super(DriverManager.getConnection("jdbc:sqlite:" + new File(dataFolder, "database.db")));
+        super(DriverManager.getConnection("jdbc:sqlite:" + new File(dataFolder, "database.db")), "frConomy");
     }
 
 }
