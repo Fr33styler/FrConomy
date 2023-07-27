@@ -3,25 +3,29 @@ package ro.fr33styler.frconomy.command;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import ro.fr33styler.frconomy.FrConomy;
 import ro.fr33styler.frconomy.account.Account;
+import ro.fr33styler.frconomy.util.FrCommand;
 
-public class Pay implements CommandExecutor {
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
-    private FrConomy main;
+public class Pay implements FrCommand {
 
-    public Pay(FrConomy main) {
-        this.main = main;
+    private final FrConomy plugin;
+
+    public Pay(FrConomy plugin) {
+        this.plugin = plugin;
     }
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String name, String[] args) {
         if (!sender.hasPermission("frconomy.pay")) {
-            sender.sendMessage(main.getPermission());
+            sender.sendMessage(plugin.getMessages().getPermission());
         } else if (sender == Bukkit.getConsoleSender()) {
             sender.sendMessage("Can be used only by players!");
         } else if (args.length != 2) {
@@ -29,40 +33,59 @@ public class Pay implements CommandExecutor {
         } else {
             Player player = (Player) sender;
             OfflinePlayer target = Bukkit.getOfflinePlayer(args[0]);
-            if (player.getUniqueId() == target.getUniqueId()) {
-                sender.sendMessage(main.getMoneyYourself());
+            if (player.getUniqueId().equals(target.getUniqueId())) {
+                sender.sendMessage(plugin.getMessages().getMoneyYourself());
             } else {
                 try {
-                    double amount = Math.abs(Double.parseDouble(args[1]));
+                    double amount = Double.parseDouble(args[1]);
                     if (amount < 0) {
-                        sender.sendMessage(main.getPositive());
-                    } else if (!main.getAccounts().hasAccount(target)) {
-                        sender.sendMessage(main.getPayAccount());
+                        sender.sendMessage(plugin.getMessages().getPositive());
+                    } else if (!plugin.getAccounts().hasAccount(target)) {
+                        sender.sendMessage(plugin.getMessages().getPayAccount());
                     } else {
-                        Account playerAccount = main.getAccounts().getAccount(player);
+                        Account playerAccount = plugin.getAccounts().getAccount(player);
                         if (playerAccount.getBalance() < amount) {
-                            sender.sendMessage(main.getNotEnough());
+                            sender.sendMessage(plugin.getMessages().getNotEnough());
                         } else {
-                            Account targetAccount = main.getAccounts().getAccount(target);
-                            if (!targetAccount.canReceive()) {
-                                sender.sendMessage(main.getMoneyDenied());
-                            } else {
-                                playerAccount.setBalance(playerAccount.getBalance() - amount);
-                                targetAccount.setBalance(targetAccount.getBalance() + amount);
-                                sender.sendMessage(main.getSentTo().replace("%money%", main.formatCurrency(amount)).replace("%name%", target.getName()));
-                                if (target.isOnline()) {
-                                    ((Player) target).sendMessage(main.getReceivedFrom().replace("%money%", main.formatCurrency(amount)).replace("%name%", player.getName()));
-                                }
-                                return true;
+                            Account targetAccount = plugin.getAccounts().getAccount(target);
+                            playerAccount.setBalance(playerAccount.getBalance() - amount);
+                            targetAccount.setBalance(targetAccount.getBalance() + amount);
+                            String sentTo = plugin.getMessages().getSentTo();
+                            sentTo = sentTo.replace("%money%", plugin.getFormatter().formatCurrency(amount));
+                            sentTo = sentTo.replace("%name%", target.getName());
+                            sender.sendMessage(sentTo);
+                            if (target.isOnline()) {
+                                String receivedFrom = plugin.getMessages().getReceivedFrom();
+                                receivedFrom = receivedFrom.replace("%money%", plugin.getFormatter().formatCurrency(amount));
+                                receivedFrom = receivedFrom.replace("%name%", player.getName());
+                                ((Player) target).sendMessage(receivedFrom);
                             }
+                            return true;
                         }
                     }
                 } catch (NumberFormatException e) {
-                    sender.sendMessage(main.getPayNotNumber());
+                    sender.sendMessage(plugin.getMessages().getPayNotNumber());
                 }
             }
         }
         return false;
     }
 
+    @Override
+    public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args) {
+        if (sender.hasPermission("frconomy.pay")) {
+            List<String> suggestions = new ArrayList<>();
+            if (args.length == 1) {
+                for (Player player : Bukkit.getOnlinePlayers()) {
+                    if (player.getName().startsWith(args[0])) {
+                        suggestions.add(player.getName());
+                    }
+                }
+            } else if (args.length == 2) {
+                suggestions.add("<amount>");
+            }
+            return suggestions;
+        }
+        return Collections.emptyList();
+    }
 }

@@ -11,28 +11,24 @@ import ro.fr33styler.frconomy.FrConomy;
 
 public class Accounts {
 
-    private FrConomy main;
-    private Map<UUID, Account> cached = new HashMap<>();
+    private final FrConomy plugin;
+    private final Map<UUID, Account> cached = new HashMap<>();
 
-    public Accounts(FrConomy main) {
-        this.main = main;
+    public Accounts(FrConomy plugin) {
+        this.plugin = plugin;
     }
 
-    public Map<UUID, Account> getCached() {
-        return cached;
+    public void add(Player player) {
+        Account account = new Account(player.getUniqueId(), player.getName());
+        account.setBalance(plugin.getSettings().getDefaultMoney());
+        cached.put(player.getUniqueId(), account);
+        plugin.getSQLDatabase().getAccount(account, () -> plugin.getSQLDatabase().createAccount(account));
     }
 
-    public void onJoin(Player p) {
-        Account account = new Account(p.getUniqueId(), p.getName());
-        account.setBalance(main.getDefaultMoney());
-        main.getSQLDatabase().getOrInsertAccountAsync(account);
-        cached.put(p.getUniqueId(), account);
-    }
-
-    public void onQuit(Player p) {
-        Account account = cached.remove(p.getUniqueId());
+    public void remove(Player player) {
+        Account account = cached.remove(player.getUniqueId());
         if (account != null) {
-            main.getSQLDatabase().updateAccountAsync(account);
+            plugin.getSQLDatabase().updateAccount(account);
         }
     }
 
@@ -40,9 +36,9 @@ public class Accounts {
         Account account = cached.get(player.getUniqueId());
         if (account == null) {
             account = new Account(player);
-            account.setBalance(main.getDefaultMoney());
-            if (!main.getSQLDatabase().hasAccount(account)) {
-                return main.getSQLDatabase().createAccount(account);
+            account.setBalance(plugin.getSettings().getDefaultMoney());
+            if (!plugin.getSQLDatabase().hasAccount(account)) {
+                return plugin.getSQLDatabase().createAccount(account);
             }
         }
         return false;
@@ -52,7 +48,7 @@ public class Accounts {
         Account account = cached.get(player.getUniqueId());
         if (account == null) {
             account = new Account(player);
-            main.getSQLDatabase().getAccount(account, null);
+            plugin.getSQLDatabase().getAccount(account);
         }
         return account;
     }
@@ -60,7 +56,7 @@ public class Accounts {
     public boolean hasAccount(OfflinePlayer player) {
         Account account = cached.get(player.getUniqueId());
         if (account == null) {
-            return main.getSQLDatabase().hasAccount(new Account(player));
+            return plugin.getSQLDatabase().hasAccount(new Account(player));
         }
         return true;
     }

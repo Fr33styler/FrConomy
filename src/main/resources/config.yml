@@ -1,32 +1,44 @@
-Settings:
-  DefaultMoney: 300
-MySQL:
-  Enabled: false
-  AutoReconnect: false
-  Table: frConomy
-  Host: 127.0.0.1
-  Database: database
-  Username: Fr33styler
-  Password: '12345'
-  Port: 3306
-Messages:
-  CurrencyPlural: 'Dollars'
-  CurrencySingular: 'Dollar'
-  CurrencyFormat: '%money% %currency%'
-  Positive: '&cMust be positive!'
-  NotEnough: '&cNot enough funds!'
-  NoPermission: '&cYou don''t have permission to execute this!'
-  SentTo: '&2You''ve sent &f%money% &2To&f %name%'
-  ReceivedFrom: '&2You''ve received&f %money% &2From&f %name%'
-  MoneyToggleOn: '&2You can receive money again!'
-  MoneyToggleOff: '&2You can''t receive money anymore!'
-  MoneyDenied: '&cYou can''t send money to this account!'
-  MoneyYourself: '&cYou can''t send money to yourself!'
-  Money: '&2[&fMoney&2] Balance: &f%money%'
-  MoneyPlayer: '&2[&fMoney&2] The balance of &f%name%&2 is &f%money%'
-  PayAccount: '&cThe account doesn''t exists!'
-  PayNotNumber: '&cThe amount must be a number!'
-  Top: '&2[&fMoney&2] Top Money'
-  TopRank: '  &e%rank%. &2%name%: &f%money%'
-  TopNotFound: '&cPage not found!'
-  TopAllMoney: '&2The server balance is: &f%all_money%'
+settings:
+  default-money: 300
+  #If the value is less than one it'll use the minor currency for display
+  #Example for 25.65: Dollars
+  #Example for 0.65: Coins
+  use-minor-if-less-than-one: true
+mysql:
+  enabled: false
+  host: 127.0.0.1
+  database: database
+  port: 3306
+  username: Fr33styler
+  password: '12345'
+  properties:
+    useSSL: true
+    trustServerCertificate: true
+    autoReconnect: true
+messages:
+  currency-major-plural: 'Dollars'
+  currency-major-singular: 'Dollar'
+  currency-minor-plural: 'Coins'
+  currency-minor-singular: 'Coin'
+  #List of placeholders:
+  #%money% - Show the amount as 1,568.53
+  #%money_major% - Show the amount as 1568
+  #%money_minor% - Show the amount as 53
+  #%currency% - Show the currency as Dollar(s) or or Coin(s)
+  #%currency_major% Show the currency for major as Dollar(s)
+  #%currency_minor% Show the currency for minor as Coin(s)
+  currency-format: '%money% %currency%'
+  positive: '&cMust be positive!'
+  not-enough: '&cNot enough funds!'
+  no-permission: '&cYou don''t have permission to execute this!'
+  sent-to: '&2You''ve sent &f%money% &2To&f %name%'
+  received-from: '&2You''ve received&f %money% &2From&f %name%'
+  money-yourself: '&cYou can''t send money to yourself!'
+  money: '&2[&fMoney&2] Balance: &f%money%'
+  money-player: '&2[&fMoney&2] The balance of &f%name%&2 is &f%money%'
+  pay-account: '&cThe account doesn''t exists!'
+  pay-not-number: '&cThe amount must be a number!'
+  top: '&2[&fMoney&2] Top Money'
+  top-rank: '  &e%rank%. &2%name%: &f%money%'
+  top-not-found: '&cPage not found!'
+  top-congregated-money: '&2The server balance is: &f%congregated_money%'

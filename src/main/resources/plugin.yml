@@ -1,9 +1,10 @@
-name: frConomy
-version: 1.13a
+name: ${plugin.name}
+version: ${project.version}
+main: ${plugin.main.classpath}
 api-version: 1.13
-main: ro.fr33styler.frconomy.FrConomy
 author: Fr33styler
-softdepend: [Vault]
+depend:
+  - Vault
 load: STARTUP
 commands:
   money:
@@ -11,7 +12,7 @@ commands:
     aliases: [bal]
   pay:
     description: Pay money.
-  baltop:
+  balTop:
     description: Show top users.
   eco:
     description: Admin money management.

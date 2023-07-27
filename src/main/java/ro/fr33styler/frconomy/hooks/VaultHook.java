@@ -1,43 +1,42 @@
-package ro.fr33styler.frconomy.vault;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
+package ro.fr33styler.frconomy.hooks;
 
 import net.milkbowl.vault.economy.AbstractEconomy;
 import net.milkbowl.vault.economy.EconomyResponse;
 import net.milkbowl.vault.economy.EconomyResponse.ResponseType;
+import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import ro.fr33styler.frconomy.FrConomy;
 import ro.fr33styler.frconomy.account.Account;
 
+import java.util.Collections;
+import java.util.List;
+
 public class VaultHook extends AbstractEconomy {
 
-    private FrConomy main;
+    private final FrConomy plugin;
 
     public VaultHook(FrConomy main) {
-        this.main = main;
+        this.plugin = main;
     }
 
     @Override
     public String getName() {
-        return main.getDescription().getName();
+        return plugin.getDescription().getName();
     }
 
     @Override
     public boolean isEnabled() {
-        return main.isEnabled();
+        return plugin.isEnabled();
     }
 
     @Override
     public String currencyNamePlural() {
-        return main.getCurrency(2);
+        return plugin.getMessages().getCurrencyMajorPlural();
     }
 
     @Override
     public String currencyNameSingular() {
-        return main.getCurrency(1);
+        return plugin.getMessages().getCurrencyMajorSingular();
     }
 
     @Override
@@ -47,15 +46,16 @@ public class VaultHook extends AbstractEconomy {
 
     @Override
     public String format(double balance) {
-        return main.formatCurrency(balance);
+        return plugin.getFormatter().formatCurrency(balance);
     }
+
+    private static final EconomyResponse NEGATIVE_FOUND = new EconomyResponse(0, 0,
+            ResponseType.FAILURE, "Cannot deposit negative funds");;
 
     @Override
     public EconomyResponse withdrawPlayer(OfflinePlayer player, double amount) {
-        if (amount < 0) {
-            return new EconomyResponse(0, 0, ResponseType.FAILURE, "Cannot desposit negative funds");
-        }
-        Account account = main.getAccounts().getAccount(player);
+        if (amount < 0) return NEGATIVE_FOUND;
+        Account account = plugin.getAccounts().getAccount(player);
         if (account.getBalance() >= amount) {
             account.setBalance(account.getBalance() - amount);
             return new EconomyResponse(amount, account.getBalance(), ResponseType.SUCCESS, null);
@@ -70,12 +70,10 @@ public class VaultHook extends AbstractEconomy {
 
     @Override
     public EconomyResponse depositPlayer(OfflinePlayer player, double amount) {
-        if (amount < 0) {
-            return new EconomyResponse(0, 0, ResponseType.FAILURE, "Cannot desposit negative funds");
-        }
-        Account account = main.getAccounts().getAccount(player);
+        if (amount < 0) return NEGATIVE_FOUND;
+        Account account = plugin.getAccounts().getAccount(player);
         account.setBalance(account.getBalance() + amount);
-        main.getSQLDatabase().updateAccountAsync(account);
+        plugin.getSQLDatabase().updateAccount(account);
         return new EconomyResponse(amount, account.getBalance(), ResponseType.SUCCESS, null);
     }
 
@@ -86,7 +84,7 @@ public class VaultHook extends AbstractEconomy {
 
     @Override
     public boolean createPlayerAccount(OfflinePlayer player) {
-        return main.getAccounts().createAccount(player);
+        return plugin.getAccounts().createAccount(player);
     }
 
     @Override
@@ -96,7 +94,7 @@ public class VaultHook extends AbstractEconomy {
 
     @Override
     public double getBalance(OfflinePlayer player) {
-        return main.getAccounts().getAccount(player).getBalance();
+        return plugin.getAccounts().getAccount(player).getBalance();
     }
 
     @Override
@@ -106,7 +104,7 @@ public class VaultHook extends AbstractEconomy {
 
     @Override
     public boolean has(OfflinePlayer player, double amount) {
-        return main.getAccounts().getAccount(player).getBalance() >= amount;
+        return plugin.getAccounts().getAccount(player).getBalance() >= amount;
     }
 
     @Override
@@ -116,7 +114,7 @@ public class VaultHook extends AbstractEconomy {
 
     @Override
     public boolean hasAccount(OfflinePlayer player) {
-        return main.getAccounts().hasAccount(player);
+        return plugin.getAccounts().hasAccount(player);
     }
 
     @Override
@@ -191,47 +189,50 @@ public class VaultHook extends AbstractEconomy {
 
     @Override
     public List<String> getBanks() {
-        return new ArrayList<>();
+        return Collections.emptyList();
     }
+
+    private static final EconomyResponse BANK_UNSUPPORTED = new EconomyResponse(0.0, 0.0,
+            ResponseType.FAILURE, "The bank is not supported!");
 
     @Override
     public EconomyResponse isBankMember(String name, String worldName) {
-        return new EconomyResponse(0.0, 0.0, ResponseType.FAILURE, "The bank is not supported!");
+        return BANK_UNSUPPORTED;
     }
 
     @Override
     public EconomyResponse isBankOwner(String name, String worldName) {
-        return new EconomyResponse(0.0, 0.0, ResponseType.FAILURE, "The bank is not supported!");
+        return BANK_UNSUPPORTED;
     }
 
     @Override
     public EconomyResponse deleteBank(String name) {
-        return new EconomyResponse(0.0, 0.0, ResponseType.FAILURE, "The bank is not supported!");
+        return BANK_UNSUPPORTED;
     }
 
     @Override
     public EconomyResponse bankBalance(String name) {
-        return new EconomyResponse(0.0, 0.0, ResponseType.FAILURE, "The bank is not supported!");
+        return BANK_UNSUPPORTED;
     }
 
     @Override
     public EconomyResponse bankDeposit(String name, double amount) {
-        return new EconomyResponse(0.0, 0.0, ResponseType.FAILURE, "The bank is not supported!");
+        return BANK_UNSUPPORTED;
     }
 
     @Override
     public EconomyResponse bankHas(String name, double amount) {
-        return new EconomyResponse(0.0, 0.0, ResponseType.FAILURE, "The bank is not supported!");
+        return BANK_UNSUPPORTED;
     }
 
     @Override
     public EconomyResponse bankWithdraw(String name, double amount) {
-        return new EconomyResponse(0.0, 0.0, ResponseType.FAILURE, "The bank is not supported!");
+        return BANK_UNSUPPORTED;
     }
 
     @Override
     public EconomyResponse createBank(String name, String worldName) {
-        return new EconomyResponse(0.0, 0.0, ResponseType.FAILURE, "The bank is not supported!");
+        return BANK_UNSUPPORTED;
     }
 
 }

@@ -3,19 +3,23 @@ package ro.fr33styler.frconomy.command;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import ro.fr33styler.frconomy.FrConomy;
 import ro.fr33styler.frconomy.account.Account;
+import ro.fr33styler.frconomy.util.FrCommand;
 
-public class Money implements CommandExecutor {
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
-    private FrConomy main;
+public class Money implements FrCommand {
 
-    public Money(FrConomy main) {
-        this.main = main;
+    private final FrConomy plugin;
+
+    public Money(FrConomy plugin) {
+        this.plugin = plugin;
     }
 
     @Override
@@ -23,45 +27,49 @@ public class Money implements CommandExecutor {
         if (args.length == 0) {
             if (sender.hasPermission("frconomy.money")) {
                 if (sender instanceof Player) {
-                    Player p = (Player) sender;
-                    Account account = main.getAccounts().getAccount(p);
-                    p.sendMessage(main.getMoney().replace("%money%", main.formatCurrency(account.getBalance())));
+                    Player player = (Player) sender;
+                    Account account = plugin.getAccounts().getAccount(player);
+                    String money = plugin.getMessages().getMoney();
+                    money = money.replace("%money%", plugin.getFormatter().formatCurrency(account.getBalance()));
+                    player.sendMessage(money);
                     return true;
                 } else {
                     sender.sendMessage("§cInvalid arguments! Please use /money <name>");
                 }
             } else {
-                sender.sendMessage(main.getPermission());
+                sender.sendMessage(plugin.getMessages().getPermission());
             }
         } else if (args.length == 1) {
-            if (args[0].equals("toggle")) {
-                if (sender instanceof Player) {
-                    Player p = (Player) sender;
-                    Account account = main.getAccounts().getAccount(p);
-                    account.setReceive(!account.canReceive());
-                    if (account.canReceive()) {
-                        p.sendMessage(main.getMoneyToggleOn());
-                    } else {
-                        p.sendMessage(main.getMoneyToggleOff());
-                    }
-                    return true;
-                } else {
-                    sender.sendMessage("§cInvalid arguments! Please use /money <name>");
-                }
-            } else if (sender.hasPermission("frconomy.money.name")) {
+            if (sender.hasPermission("frconomy.money.name")) {
                 OfflinePlayer target = Bukkit.getOfflinePlayer(args[0]);
-                if (main.getAccounts().hasAccount(target)) {
-                    Account account = main.getAccounts().getAccount(target);
-                    sender.sendMessage(main.getMoneyPlayer().replace("%money%", main.formatCurrency(account.getBalance())).replace("%name%", target.getName()));
+                if (plugin.getAccounts().hasAccount(target)) {
+                    Account account = plugin.getAccounts().getAccount(target);
+                    String moneyPlayer = plugin.getMessages().getMoneyPlayer();
+                    moneyPlayer = moneyPlayer.replace("%money%", plugin.getFormatter().formatCurrency(account.getBalance()));
+                    moneyPlayer = moneyPlayer.replace("%name%", target.getName());
+                    sender.sendMessage(moneyPlayer);
                     return true;
                 } else {
                     sender.sendMessage("§cThe account was not found!");
                 }
             } else {
-                sender.sendMessage(main.getPermission());
+                sender.sendMessage(plugin.getMessages().getPermission());
             }
         }
         return false;
     }
 
+    @Override
+    public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args) {
+        if (args.length == 1 && sender.hasPermission("frconomy.money.name")) {
+            List<String> suggestions = new ArrayList<>();
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                if (player.getName().startsWith(args[0])) {
+                    suggestions.add(player.getName());
+                }
+            }
+            return suggestions;
+        }
+        return Collections.emptyList();
+    }
 }
