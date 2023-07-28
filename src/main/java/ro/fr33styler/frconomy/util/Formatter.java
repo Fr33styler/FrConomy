@@ -15,7 +15,7 @@ public class Formatter {
     }
 
     private int currencyMinor(double balance) {
-        return (int) ((balance - (int) balance) * 100);
+        return (int) (balance * 100) % 100;
     }
 
     public String getCurrency(double balance) {
