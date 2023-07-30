@@ -6,17 +6,21 @@ import java.text.DecimalFormatSymbols;
 public class EconomyUtil {
 
     private static final DecimalFormat WHOLE_FORMAT = new DecimalFormat("#,###");
+    private static final DecimalFormat WHOLE_FORMAT_COMMAS = new DecimalFormat("#,###");
     private static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("#,##0.00");
+    private static final DecimalFormat DECIMAL_FORMAT_COMMAS = new DecimalFormat("#,##0.00");
 
     static {
-        DecimalFormatSymbols wholeSymbols = new DecimalFormatSymbols();
-        wholeSymbols.setGroupingSeparator(',');
-        WHOLE_FORMAT.setDecimalFormatSymbols(wholeSymbols);
+        DecimalFormatSymbols symbols = new DecimalFormatSymbols();
+        symbols.setDecimalSeparator('.');
+        symbols.setGroupingSeparator(',');
+        WHOLE_FORMAT.setDecimalFormatSymbols(symbols);
+        DECIMAL_FORMAT.setDecimalFormatSymbols(symbols);
 
-        DecimalFormatSymbols decimalSymbols = new DecimalFormatSymbols();
-        decimalSymbols.setDecimalSeparator('.');
-        decimalSymbols.setGroupingSeparator(',');
-        DECIMAL_FORMAT.setDecimalFormatSymbols(decimalSymbols);
+        symbols.setDecimalSeparator(',');
+        symbols.setGroupingSeparator('.');
+        WHOLE_FORMAT_COMMAS.setDecimalFormatSymbols(symbols);
+        DECIMAL_FORMAT_COMMAS.setDecimalFormatSymbols(symbols);
     }
 
     private EconomyUtil() {}
@@ -25,8 +29,15 @@ public class EconomyUtil {
         return WHOLE_FORMAT;
     }
 
+    public static DecimalFormat getWholeFormatCommas() {
+        return WHOLE_FORMAT_COMMAS;
+    }
+
     public static DecimalFormat getDecimalFormat() {
         return DECIMAL_FORMAT;
     }
 
+    public static DecimalFormat getDecimalFormatCommas() {
+        return DECIMAL_FORMAT_COMMAS;
+    }
 }

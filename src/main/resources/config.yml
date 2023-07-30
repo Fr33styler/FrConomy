@@ -23,7 +23,9 @@ messages:
   currency-minor-singular: 'Coin'
   #List of placeholders:
   #%money% - Show the amount as 1,568.53
-  #%money_major% - Show the amount as 1568
+  #%money_commas% - Show the amount as 1.568,53
+  #%money_major% - Show the amount as 1,568
+  #%money_major_commas% - Show the amount as 1.568
   #%money_minor% - Show the amount as 53
   #%currency% - Show the currency as Dollar(s) or or Coin(s)
   #%currency_major% Show the currency for major as Dollar(s)

@@ -38,7 +38,9 @@ public class Formatter {
     public String formatCurrency(double balance) {
         String currencyFormat = plugin.getMessages().getCurrencyFormat();
         currencyFormat = currencyFormat.replace("%money%", EconomyUtil.getDecimalFormat().format(balance));
+        currencyFormat = currencyFormat.replace("%money_commas%", EconomyUtil.getDecimalFormatCommas().format(balance));
         currencyFormat = currencyFormat.replace("%money_major%", EconomyUtil.getWholeFormat().format(currencyMajor(balance)));
+        currencyFormat = currencyFormat.replace("%money_major_commas%", EconomyUtil.getWholeFormatCommas().format(currencyMajor(balance)));
         currencyFormat = currencyFormat.replace("%money_minor%", String.valueOf(currencyMinor(balance)));
         currencyFormat = currencyFormat.replace("%currency%", getCurrency(balance));
         currencyFormat = currencyFormat.replace("%currency_major%", getCurrencyMajor(balance));
