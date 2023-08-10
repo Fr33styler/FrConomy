@@ -4,6 +4,9 @@ settings:
   #Example for 25.65: Dollars
   #Example for 0.65: Coins
   use-minor-if-less-than-one: true
+  #Shorten the amount using t/b/m/k suffixes
+  short-scale-notation: false
+  pay-require-confirmation: false
 mysql:
   enabled: false
   host: 127.0.0.1
@@ -39,6 +42,7 @@ messages:
   money-yourself: '&cYou can''t send money to yourself!'
   money: '&2[&fMoney&2] Balance: &f%money%'
   money-player: '&2[&fMoney&2] The balance of &f%name%&2 is &f%money%'
+  confirmation-required: '&2You are about to send &f%money% &2to &f%name%&2. Type the command again in order to confirm!'
   pay-account: '&cThe account doesn''t exists!'
   pay-not-number: '&cThe amount must be a number!'
   top: '&2[&fMoney&2] Top Money'

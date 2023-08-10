@@ -8,9 +8,11 @@ import org.bukkit.entity.Player;
 
 import ro.fr33styler.frconomy.FrConomy;
 import ro.fr33styler.frconomy.account.Account;
+import ro.fr33styler.frconomy.util.EconomyUtil;
 import ro.fr33styler.frconomy.util.FrCommand;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -37,16 +39,25 @@ public class Pay implements FrCommand {
                 sender.sendMessage(plugin.getMessages().getMoneyYourself());
             } else {
                 try {
-                    double amount = Double.parseDouble(args[1]);
+                    double amount = EconomyUtil.fromShortScaleNotation(args[1]);
                     if (amount < 0) {
                         sender.sendMessage(plugin.getMessages().getPositive());
                     } else if (!plugin.getAccounts().hasAccount(target)) {
                         sender.sendMessage(plugin.getMessages().getPayAccount());
                     } else {
                         Account playerAccount = plugin.getAccounts().getAccount(player);
-                        if (playerAccount.getBalance() < amount) {
+                        if (plugin.getSettings().hasPayRequireConfirmation() &&
+                                !Arrays.deepEquals(playerAccount.getConfirmation(), args)) {
+
+                            playerAccount.setConfirmation(args);
+                            String confirmationRequired = plugin.getMessages().getConfirmationRequired();
+                            confirmationRequired = confirmationRequired.replace("%money%", plugin.getFormatter().formatCurrency(amount));
+                            confirmationRequired = confirmationRequired.replace("%name%", target.getName());
+                            sender.sendMessage(confirmationRequired);
+                        } else if (playerAccount.getBalance() < amount) {
                             sender.sendMessage(plugin.getMessages().getNotEnough());
                         } else {
+                            playerAccount.setConfirmation(null);
                             Account targetAccount = plugin.getAccounts().getAccount(target);
                             playerAccount.setBalance(playerAccount.getBalance() - amount);
                             targetAccount.setBalance(targetAccount.getBalance() + amount);

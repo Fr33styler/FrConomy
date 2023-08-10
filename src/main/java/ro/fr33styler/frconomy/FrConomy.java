@@ -42,6 +42,8 @@ public class FrConomy extends JavaPlugin {
 
         console.sendMessage("§a - Loading config...");
         FileConfiguration config = getConfig();
+        config.options().copyDefaults(true);
+        saveConfig();
         settings = new Settings(config.getConfigurationSection("settings"));
         messages = new Messages(config.getConfigurationSection("messages"));
 

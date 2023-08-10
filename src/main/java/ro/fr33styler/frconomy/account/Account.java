@@ -9,6 +9,7 @@ public class Account {
     private final UUID uuid;
     private final String name;
     private double balance = 0.00;
+    private String[] confirmation = null;
 
     public Account(UUID uuid, String name) {
         this.uuid = uuid;
@@ -34,6 +35,14 @@ public class Account {
 
     public void setBalance(double balance) {
         this.balance = balance;
+    }
+
+    public String[] getConfirmation() {
+        return confirmation;
+    }
+
+    public void setConfirmation(String[] confirmation) {
+        this.confirmation = confirmation;
     }
 
 }

@@ -12,6 +12,7 @@ public class Messages {
 
     private final String money;
     private final String moneyPlayer;
+    private final String confirmationRequired;
     private final String sentTo;
     private final String receivedFrom;
     private final String notEnough;
@@ -33,6 +34,7 @@ public class Messages {
         currencyFormat = get(section, "currency-format");
         receivedFrom = get(section, "received-from");
         moneyPlayer = get(section, "money-player");
+        confirmationRequired = get(section, "confirmation-required");
         notEnough = get(section, "not-enough");
         sentTo = get(section, "sent-to");
         money = get(section, "money");
@@ -73,6 +75,10 @@ public class Messages {
 
     public String getMoneyPlayer() {
         return moneyPlayer;
+    }
+
+    public String getConfirmationRequired() {
+        return confirmationRequired;
     }
 
     public String getPermission() {

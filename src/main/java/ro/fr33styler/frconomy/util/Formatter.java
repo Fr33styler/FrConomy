@@ -37,8 +37,13 @@ public class Formatter {
 
     public String formatCurrency(double balance) {
         String currencyFormat = plugin.getMessages().getCurrencyFormat();
-        currencyFormat = currencyFormat.replace("%money%", EconomyUtil.getDecimalFormat().format(balance));
-        currencyFormat = currencyFormat.replace("%money_commas%", EconomyUtil.getDecimalFormatCommas().format(balance));
+        if (plugin.getSettings().hasShortScaleNotation()) {
+            currencyFormat = currencyFormat.replace("%money%", EconomyUtil.toShortScaleNotation(balance, false));
+            currencyFormat = currencyFormat.replace("%money_commas%", EconomyUtil.toShortScaleNotation(balance, true));
+        } else {
+            currencyFormat = currencyFormat.replace("%money%", EconomyUtil.getDecimalFormat().format(balance));
+            currencyFormat = currencyFormat.replace("%money_commas%", EconomyUtil.getDecimalFormatCommas().format(balance));
+        }
         currencyFormat = currencyFormat.replace("%money_major%", EconomyUtil.getWholeFormat().format(currencyMajor(balance)));
         currencyFormat = currencyFormat.replace("%money_major_commas%", EconomyUtil.getWholeFormatCommas().format(currencyMajor(balance)));
         currencyFormat = currencyFormat.replace("%money_minor%", String.valueOf(currencyMinor(balance)));
