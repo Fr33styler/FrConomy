@@ -43,6 +43,7 @@ messages:
   money: '&2[&fMoney&2] Balance: &f%money%'
   money-player: '&2[&fMoney&2] The balance of &f%name%&2 is &f%money%'
   confirmation-required: '&2You are about to send &f%money% &2to &f%name%&2. Type the command again in order to confirm!'
+  pay-amount-argument: '<amount>'
   pay-account: '&cThe account doesn''t exists!'
   pay-not-number: '&cThe amount must be a number!'
   top: '&2[&fMoney&2] Top Money'

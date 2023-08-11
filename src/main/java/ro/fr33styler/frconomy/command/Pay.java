@@ -93,7 +93,7 @@ public class Pay implements FrCommand {
                     }
                 }
             } else if (args.length == 2) {
-                suggestions.add("<amount>");
+                suggestions.add(plugin.getMessages().getPayAmountArgument());
             }
             return suggestions;
         }

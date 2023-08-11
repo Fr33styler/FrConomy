@@ -92,7 +92,7 @@ public abstract class Database {
                         double balance = result.getDouble(2);
                         if (position <= i && position + 10 > i) {
                             String name = result.getString(1);
-                            if (name != null && name.length() > 0) {
+                            if (name != null && !name.isEmpty()) {
                                 Account account = new Account(null, name);
                                 account.setBalance(balance);
                                 top.add(account);

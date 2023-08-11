@@ -21,6 +21,7 @@ public class Messages {
     private final String topRank;
     private final String topNotFound;
     private final String positive;
+    private final String payAmountArgument;
     private final String payAccount;
     private final String payNotNumber;
     private final String moneyYourself;
@@ -40,6 +41,7 @@ public class Messages {
         money = get(section, "money");
         permission = get(section, "no-permission");
         moneyYourself = get(section, "money-yourself");
+        payAmountArgument = get(section, "pay-amount-argument");
         payAccount = get(section, "pay-account");
         payNotNumber = get(section, "pay-not-number");
         top = get(section, "top");
@@ -115,6 +117,10 @@ public class Messages {
 
     public String getPositive() {
         return positive;
+    }
+
+    public String getPayAmountArgument() {
+        return payAmountArgument;
     }
 
     public String getPayAccount() {
