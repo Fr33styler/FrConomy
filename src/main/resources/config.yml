@@ -7,6 +7,7 @@ settings:
   #Shorten the amount using t/b/m/k suffixes
   short-scale-notation: false
   pay-require-confirmation: false
+  commas-for-grouping: false
 mysql:
   enabled: false
   host: 127.0.0.1

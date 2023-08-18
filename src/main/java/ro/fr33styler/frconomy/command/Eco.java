@@ -8,7 +8,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import ro.fr33styler.frconomy.FrConomy;
 import ro.fr33styler.frconomy.account.Account;
-import ro.fr33styler.frconomy.util.EconomyUtil;
+import ro.fr33styler.frconomy.util.ShortScaleUtil;
 import ro.fr33styler.frconomy.util.FrCommand;
 
 import java.util.ArrayList;
@@ -35,7 +35,7 @@ public class Eco implements FrCommand {
             } else if (args.length == 3) {
                 OfflinePlayer target = Bukkit.getOfflinePlayer(args[1]);
                 try {
-                    double amount = EconomyUtil.fromShortScaleNotation(args[2]);
+                    double amount = ShortScaleUtil.fromShortScaleNotation(args[2]);
                     if (args[0].equals("give")) {
                         if (plugin.getAccounts().hasAccount(target)) {
                             Account account = plugin.getAccounts().getAccount(target);

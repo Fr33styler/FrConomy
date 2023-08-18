@@ -8,7 +8,7 @@ import org.bukkit.entity.Player;
 
 import ro.fr33styler.frconomy.FrConomy;
 import ro.fr33styler.frconomy.account.Account;
-import ro.fr33styler.frconomy.util.EconomyUtil;
+import ro.fr33styler.frconomy.util.ShortScaleUtil;
 import ro.fr33styler.frconomy.util.FrCommand;
 
 import java.util.ArrayList;
@@ -39,7 +39,7 @@ public class Pay implements FrCommand {
                 sender.sendMessage(plugin.getMessages().getMoneyYourself());
             } else {
                 try {
-                    double amount = EconomyUtil.fromShortScaleNotation(args[1]);
+                    double amount = ShortScaleUtil.fromShortScaleNotation(args[1]);
                     if (amount < 0) {
                         sender.sendMessage(plugin.getMessages().getPositive());
                     } else if (!plugin.getAccounts().hasAccount(target)) {

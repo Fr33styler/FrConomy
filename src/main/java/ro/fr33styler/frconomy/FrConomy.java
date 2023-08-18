@@ -26,13 +26,13 @@ import java.sql.SQLException;
 
 public class FrConomy extends JavaPlugin {
 
+    private Metrics metrics;
     private Database database;
     private Settings settings;
     private Messages messages;
     private VaultHook vaultHook;
-    private Metrics metrics;
+    private Formatter formatter;
     private final Accounts accounts = new Accounts(this);
-    private final Formatter formatter = new Formatter(this);
 
     public void onEnable() {
         saveDefaultConfig();
@@ -46,6 +46,8 @@ public class FrConomy extends JavaPlugin {
         saveConfig();
         settings = new Settings(config.getConfigurationSection("settings"));
         messages = new Messages(config.getConfigurationSection("messages"));
+
+        formatter = new Formatter(this);
 
         console.sendMessage("§a - Loading database...");
         try {

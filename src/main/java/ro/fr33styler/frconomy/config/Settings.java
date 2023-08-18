@@ -8,12 +8,14 @@ public class Settings {
     private final boolean useMinorIfLessThanOne;
     private final boolean shortScaleNotation;
     private final boolean payRequireConfirmation;
+    private final boolean commasForGrouping;
 
     public Settings(ConfigurationSection section) {
         defaultMoney = section.getDouble("default-money");
         useMinorIfLessThanOne = section.getBoolean("use-minor-if-less-than-one");
         shortScaleNotation = section.getBoolean("short-scale-notation");
         payRequireConfirmation = section.getBoolean("pay-require-confirmation");
+        commasForGrouping = section.getBoolean("commas-for-grouping");
     }
 
     public double getDefaultMoney() {
@@ -30,6 +32,10 @@ public class Settings {
 
     public boolean hasPayRequireConfirmation() {
         return payRequireConfirmation;
+    }
+
+    public boolean hasCommasForGrouping() {
+        return commasForGrouping;
     }
 
 }
