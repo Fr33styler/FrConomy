@@ -46,7 +46,7 @@ public class Top implements FrCommand {
             return false;
         }
         plugin.getSQLDatabase().getTopAsync(page[0], (congregatedBalances, list) -> {
-            if (list.size() == 0) {
+            if (list.isEmpty()) {
                 sender.sendMessage(plugin.getMessages().getTopNotFound());
                 return;
             }

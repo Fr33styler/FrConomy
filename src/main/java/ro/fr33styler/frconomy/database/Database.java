@@ -112,8 +112,8 @@ public abstract class Database {
         executor.shutdownNow().forEach(Runnable::run);
         try {
             connection.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
+        } catch (SQLException exception) {
+            exception.printStackTrace();
         }
     }
 
