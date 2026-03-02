@@ -47,7 +47,7 @@ public class Accounts {
             account.setEliminationCountdown(20);
             cached.put(player.getUniqueId(), account);
 
-            CompletableFuture<Account> futureAccount = plugin.getSQLDatabase().getAccount(player);
+            CompletableFuture<Account> futureAccount = plugin.getSQLDatabase().getAccount(account);
             futureAccount.thenAccept(newAccount -> Bukkit.getScheduler().runTask(plugin, () -> {
                 cached.put(newAccount.getUUID(), newAccount);
                 if (!player.isOnline()) newAccount.setEliminationCountdown(20);

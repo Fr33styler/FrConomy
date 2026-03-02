@@ -35,16 +35,15 @@ public abstract class Database {
         }
     }
 
-    public CompletableFuture<Account> getAccount(OfflinePlayer player) {
-        return CompletableFuture.supplyAsync(() -> getAccountSync(player), executor);
+    public CompletableFuture<Account> getAccount(Account account) {
+        return CompletableFuture.supplyAsync(() -> getAccountSync(account), executor);
     }
 
-    public Account getAccountSync(OfflinePlayer player) {
+    public Account getAccountSync(Account account) {
         try (PreparedStatement statement = connection.prepareStatement("SELECT balance FROM " + table + " WHERE uuid = ? LIMIT 1;")) {
-            statement.setString(1, player.getUniqueId().toString());
+            statement.setString(1, account.getUUID().toString());
             try (ResultSet result = statement.executeQuery()) {
                 if (result.next()) {
-                    Account account = new Account(player.getUniqueId(), player.getName());
                     account.setBalance(result.getDouble("balance"));
                     account.setLoaded(true);
                     return account;
