@@ -42,16 +42,16 @@ public class Accounts {
     public CompletableFuture<Account> getAccount(OfflinePlayer player) {
         Account account = cached.get(player.getUniqueId());
 
-        if (account == null || !account.isLoaded()) {
+        if (account == null) {
+            account = new Account(player.getUniqueId(), player.getName());
+            account.setEliminationCountdown(20);
+            cached.put(player.getUniqueId(), account);
+
             CompletableFuture<Account> futureAccount = plugin.getSQLDatabase().getAccount(player);
             futureAccount.thenAccept(newAccount -> Bukkit.getScheduler().runTask(plugin, () -> {
                 cached.put(newAccount.getUUID(), newAccount);
                 if (!player.isOnline()) newAccount.setEliminationCountdown(20);
             }));
-
-            Account newAccount = new Account(player.getUniqueId(), player.getName());
-            newAccount.setEliminationCountdown(20);
-            cached.put(player.getUniqueId(), newAccount);
 
             return futureAccount;
         }
