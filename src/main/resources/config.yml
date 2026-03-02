@@ -8,6 +8,11 @@ settings:
   short-scale-notation: false
   pay-require-confirmation: false
   commas-for-grouping: false
+  #Valid vault methods:
+  #online-only: Best performance, it doesn't work with offline players
+  #confirm: Payments to offline players will require typing it once, waiting a while and typing again
+  #blocking: Payments will be processed immediately at the cost of performance
+  vault-method: 'online-only'
 mysql:
   enabled: false
   host: 127.0.0.1
@@ -36,7 +41,11 @@ messages:
   #%currency_minor% Show the currency for minor as Coin(s)
   currency-format: '%money% %currency%'
   positive: '&cMust be positive!'
+  deposit-negative: '&cCannot deposit negative funds'
+  withdraw-negative: '&cCannot withdraw negative funds'
+  not-online: '&cPlayer not online!'
   not-enough: '&cNot enough funds!'
+  not-valid: '&cInvalid page number!'
   no-permission: '&cYou don''t have permission to execute this!'
   sent-to: '&2You''ve sent &f%money% &2To&f %name%'
   received-from: '&2You''ve received&f %money% &2From&f %name%'
@@ -45,9 +54,11 @@ messages:
   money-player: '&2[&fMoney&2] The balance of &f%name%&2 is &f%money%'
   confirmation-required: '&2You are about to send &f%money% &2to &f%name%&2. Type the command again in order to confirm!'
   pay-amount-argument: '<amount>'
+  account-not-loaded: '&cThe account isn''t loaded!'
+  account-is-loading: '&cThe account isn''t loaded yet, please wait a moment!'
   pay-account: '&cThe account doesn''t exists!'
   pay-not-number: '&cThe amount must be a number!'
   top: '&2[&fMoney&2] Top Money'
   top-rank: '  &e%rank%. &2%name%: &f%money%'
   top-not-found: '&cPage not found!'
-  top-congregated-money: '&2The server balance is: &f%congregated_money%'
+  top-aggregated-money: '&2The server balance is: &f%aggregated_money%'

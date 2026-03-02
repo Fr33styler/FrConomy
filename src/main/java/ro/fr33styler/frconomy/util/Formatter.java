@@ -3,10 +3,14 @@ package ro.fr33styler.frconomy.util;
 import ro.fr33styler.frconomy.FrConomy;
 import ro.fr33styler.frconomy.config.Settings;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 
 public class Formatter {
+
+    private static final BigDecimal ONE_HUNDRED = BigDecimal.valueOf(100);
 
     private final FrConomy plugin;
     private final DecimalFormat decimalFormat = new DecimalFormat("#,###.##");
@@ -34,12 +38,27 @@ public class Formatter {
         return (int) balance;
     }
 
+    private BigInteger currencyMajor(BigDecimal balance) {
+        return balance.toBigInteger();
+    }
+
     private int currencyMinor(double balance) {
         return (int) (balance * 100) % 100;
     }
 
+    private BigInteger currencyMinor(BigDecimal balance) {
+        return balance.multiply(ONE_HUNDRED).remainder(ONE_HUNDRED).toBigInteger();
+    }
+
     public String getCurrency(double balance) {
         if (plugin.getSettings().useMinorIfLessThanOne() && balance < 1) {
+            return getCurrencyMinor(balance);
+        }
+        return getCurrencyMajor(balance);
+    }
+
+    public String getCurrency(BigDecimal balance) {
+        if (plugin.getSettings().useMinorIfLessThanOne() && balance.compareTo(BigDecimal.ONE) < 0) {
             return getCurrencyMinor(balance);
         }
         return getCurrencyMajor(balance);
@@ -50,9 +69,19 @@ public class Formatter {
         return major == 1 ? plugin.getMessages().getCurrencyMajorSingular() : plugin.getMessages().getCurrencyMajorPlural();
     }
 
+    public String getCurrencyMajor(BigDecimal balance) {
+        BigInteger major = currencyMajor(balance);
+        return major.compareTo(BigInteger.ONE) == 0 ? plugin.getMessages().getCurrencyMajorSingular() : plugin.getMessages().getCurrencyMajorPlural();
+    }
+
     public String getCurrencyMinor(double balance) {
         int minor = currencyMinor(balance);
         return minor == 1 ? plugin.getMessages().getCurrencyMinorSingular() : plugin.getMessages().getCurrencyMinorPlural();
+    }
+
+    public String getCurrencyMinor(BigDecimal balance) {
+        BigInteger minor = currencyMinor(balance);
+        return minor.compareTo(BigInteger.ONE) == 0 ? plugin.getMessages().getCurrencyMinorSingular() : plugin.getMessages().getCurrencyMinorPlural();
     }
 
     public String formatCurrency(double balance) {
@@ -64,6 +93,21 @@ public class Formatter {
         }
         currencyFormat = currencyFormat.replace("%money_major%", decimalFormat.format(currencyMajor(balance)));
         currencyFormat = currencyFormat.replace("%money_minor%", String.valueOf(currencyMinor(balance)));
+        currencyFormat = currencyFormat.replace("%currency%", getCurrency(balance));
+        currencyFormat = currencyFormat.replace("%currency_major%", getCurrencyMajor(balance));
+        currencyFormat = currencyFormat.replace("%currency_minor%", getCurrencyMinor(balance));
+        return currencyFormat;
+    }
+
+    public String formatCurrency(BigDecimal balance) {
+        String currencyFormat = plugin.getMessages().getCurrencyFormat();
+        if (plugin.getSettings().hasShortScaleNotation()) {
+            currencyFormat = currencyFormat.replace("%money%", ShortScaleUtil.toShortScaleNotation(decimalFormat, balance));
+        } else {
+            currencyFormat = currencyFormat.replace("%money%", decimalFormat.format(balance));
+        }
+        currencyFormat = currencyFormat.replace("%money_major%", decimalFormat.format(currencyMajor(balance)));
+        currencyFormat = currencyFormat.replace("%money_minor%", currencyMinor(balance).toString());
         currencyFormat = currencyFormat.replace("%currency%", getCurrency(balance));
         currencyFormat = currencyFormat.replace("%currency_major%", getCurrencyMajor(balance));
         currencyFormat = currencyFormat.replace("%currency_minor%", getCurrencyMinor(balance));

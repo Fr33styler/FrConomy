@@ -3,12 +3,18 @@ package ro.fr33styler.frconomy;
 import net.milkbowl.vault.economy.Economy;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
+import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.command.PluginCommand;
+import org.bukkit.command.TabCompleter;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitTask;
+import ro.fr33styler.frconomy.hooks.BlockingVault;
+import ro.fr33styler.frconomy.hooks.ConfirmVault;
+import ro.fr33styler.frconomy.hooks.OnlineOnlyVault;
 import ro.fr33styler.frconomy.util.Formatter;
 import ro.fr33styler.frconomy.account.Accounts;
 import ro.fr33styler.frconomy.command.*;
@@ -19,8 +25,6 @@ import ro.fr33styler.frconomy.database.mysql.MySQL;
 import ro.fr33styler.frconomy.database.mysql.MySQLData;
 import ro.fr33styler.frconomy.database.sqlite.SQLite;
 import ro.fr33styler.frconomy.events.SessionEvents;
-import ro.fr33styler.frconomy.hooks.VaultHook;
-import ro.fr33styler.frconomy.util.FrCommand;
 
 import java.sql.SQLException;
 
@@ -30,8 +34,9 @@ public class FrConomy extends JavaPlugin {
     private Database database;
     private Settings settings;
     private Messages messages;
-    private VaultHook vaultHook;
+    private Economy vaultHook;
     private Formatter formatter;
+    private BukkitTask updateTask;
     private final Accounts accounts = new Accounts(this);
 
     public void onEnable() {
@@ -59,7 +64,14 @@ public class FrConomy extends JavaPlugin {
         }
 
         console.sendMessage("§a - Hooking into Vault...");
-        getServer().getServicesManager().register(Economy.class, vaultHook = new VaultHook(this), this, ServicePriority.High);
+        if (settings.getVaultMethod().equalsIgnoreCase("confirm")) {
+            vaultHook = new ConfirmVault(this);
+        } else if (settings.getVaultMethod().equalsIgnoreCase("blocking")) {
+            vaultHook = new BlockingVault(this);
+        } else {
+            vaultHook = new OnlineOnlyVault(this);
+        }
+        getServer().getServicesManager().register(Economy.class, vaultHook, this, ServicePriority.High);
 
         console.sendMessage("§a - Loading metrics...");
         metrics = new Metrics(this, 19272);
@@ -73,6 +85,8 @@ public class FrConomy extends JavaPlugin {
         registerCommand("balTop", new Top(this));
         registerCommand("money", new Money(this));
 
+        updateTask = Bukkit.getScheduler().runTaskTimer(this, accounts::tick, 0, 1);
+
         Bukkit.getOnlinePlayers().forEach(accounts::add);
         console.sendMessage("§a" + getName() + " has been loaded!");
         console.sendMessage("§a=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=");
@@ -85,23 +99,29 @@ public class FrConomy extends JavaPlugin {
 
             getServer().getServicesManager().unregister(vaultHook);
 
+            if (updateTask != null) {
+                updateTask.cancel();
+            }
+
             database.close();
         }
     }
 
     private void loadDatabase(ConfigurationSection section) throws SQLException {
         if (section != null && section.getBoolean("enabled")) {
-            database = new MySQL(new MySQLData(section));
+            database = new MySQL(getLogger(), new MySQLData(section));
         } else {
-            database = new SQLite(getDataFolder());
+            database = new SQLite(getLogger(), getDataFolder());
         }
         database.createTable();
     }
 
-    private void registerCommand(String command, FrCommand FrCommand) {
+    private void registerCommand(String command, CommandExecutor executor) {
         PluginCommand pluginCommand = getCommand(command);
-        pluginCommand.setExecutor(FrCommand);
-        pluginCommand.setTabCompleter(FrCommand);
+        pluginCommand.setExecutor(executor);
+        if (executor instanceof TabCompleter) {
+            pluginCommand.setTabCompleter((TabCompleter) executor);
+        }
     }
 
     public Settings getSettings() {

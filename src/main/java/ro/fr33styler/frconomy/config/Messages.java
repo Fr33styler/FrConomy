@@ -15,17 +15,23 @@ public class Messages {
     private final String confirmationRequired;
     private final String sentTo;
     private final String receivedFrom;
+    private final String notOnline;
+    private final String depositNegative;
+    private final String withdrawNegative;
     private final String notEnough;
     private final String permission;
     private final String top;
     private final String topRank;
     private final String topNotFound;
     private final String positive;
+    private final String notValid;
     private final String payAmountArgument;
+    private final String accountNotLoaded;
+    private final String accountIsLoading;
     private final String payAccount;
     private final String payNotNumber;
     private final String moneyYourself;
-    private final String topCongregatedMoney;
+    private final String topAggregatedMoney;
 
     public Messages(ConfigurationSection section) {
         currencyMajorPlural = get(section, "currency-major-plural");
@@ -36,19 +42,25 @@ public class Messages {
         receivedFrom = get(section, "received-from");
         moneyPlayer = get(section, "money-player");
         confirmationRequired = get(section, "confirmation-required");
+        notOnline = get(section, "not-online");
+        depositNegative = get(section, "deposit-negative");
+        withdrawNegative = get(section, "withdraw-negative");
         notEnough = get(section, "not-enough");
         sentTo = get(section, "sent-to");
         money = get(section, "money");
         permission = get(section, "no-permission");
         moneyYourself = get(section, "money-yourself");
         payAmountArgument = get(section, "pay-amount-argument");
+        accountNotLoaded = get(section, "account-not-loaded");
+        accountIsLoading = get(section, "account-is-loading");
         payAccount = get(section, "pay-account");
         payNotNumber = get(section, "pay-not-number");
         top = get(section, "top");
         topRank = get(section, "top-rank");
         topNotFound = get(section, "top-not-found");
-        topCongregatedMoney = get(section, "top-congregated-money");
+        topAggregatedMoney = get(section, "top-aggregated-money");
         positive = get(section, "positive");
+        notValid = get(section, "not-valid");
     }
 
     public String getCurrencyMajorPlural() {
@@ -87,6 +99,18 @@ public class Messages {
         return permission;
     }
 
+    public String getNotOnline() {
+        return notOnline;
+    }
+
+    public String getDepositNegative() {
+        return depositNegative;
+    }
+
+    public String getWithdrawNegative() {
+        return withdrawNegative;
+    }
+
     public String getNotEnough() {
         return notEnough;
     }
@@ -111,16 +135,28 @@ public class Messages {
         return topNotFound;
     }
 
-    public String getTopCongregatedMoney() {
-        return topCongregatedMoney;
+    public String getTopAggregatedMoney() {
+        return topAggregatedMoney;
     }
 
     public String getPositive() {
         return positive;
     }
 
+    public String getNotValid() {
+        return notValid;
+    }
+
     public String getPayAmountArgument() {
         return payAmountArgument;
+    }
+
+    public String getAccountNotLoaded() {
+        return accountNotLoaded;
+    }
+
+    public String getAccountIsLoading() {
+        return accountIsLoading;
     }
 
     public String getPayAccount() {

@@ -1,20 +1,20 @@
 package ro.fr33styler.frconomy.command;
 
 import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
+import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 
 import ro.fr33styler.frconomy.FrConomy;
 import ro.fr33styler.frconomy.account.Account;
-import ro.fr33styler.frconomy.util.FrCommand;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class Money implements FrCommand {
+public class Money implements CommandExecutor, TabCompleter {
 
     private final FrConomy plugin;
 
@@ -26,34 +26,32 @@ public class Money implements FrCommand {
     public boolean onCommand(CommandSender sender, Command command, String name, String[] args) {
         if (args.length == 0) {
             if (sender.hasPermission("frconomy.money")) {
-                if (sender instanceof Player) {
-                    Player player = (Player) sender;
-                    Account account = plugin.getAccounts().getAccount(player);
-                    String money = plugin.getMessages().getMoney();
-                    money = money.replace("%money%", plugin.getFormatter().formatCurrency(account.getBalance()));
-                    player.sendMessage(money);
-                    return true;
-                } else {
-                    sender.sendMessage("§cInvalid arguments! Please use /money <name>");
-                }
-            } else {
                 sender.sendMessage(plugin.getMessages().getPermission());
+            } else if (!(sender instanceof Player)) {
+                sender.sendMessage("§cInvalid arguments! Please use /money <name>");
+            } else {
+                Account account = plugin.getAccounts().getCachedAccount((Player) sender);
+                if (account == null || !account.isLoaded()) {
+                    sender.sendMessage(plugin.getMessages().getAccountNotLoaded());
+                } else {
+                    sender.sendMessage(plugin.getMessages().getMoney().replace("%money%",
+                            plugin.getFormatter().formatCurrency(account.getBalance())));
+                }
+                return true;
             }
         } else if (args.length == 1) {
-            if (sender.hasPermission("frconomy.money.name")) {
-                OfflinePlayer target = Bukkit.getOfflinePlayer(args[0]);
-                if (plugin.getAccounts().hasAccount(target)) {
-                    Account account = plugin.getAccounts().getAccount(target);
-                    String moneyPlayer = plugin.getMessages().getMoneyPlayer();
-                    moneyPlayer = moneyPlayer.replace("%money%", plugin.getFormatter().formatCurrency(account.getBalance()));
-                    moneyPlayer = moneyPlayer.replace("%name%", target.getName());
-                    sender.sendMessage(moneyPlayer);
-                    return true;
-                } else {
-                    sender.sendMessage("§cThe account was not found!");
-                }
-            } else {
+            if (!sender.hasPermission("frconomy.money.name")) {
                 sender.sendMessage(plugin.getMessages().getPermission());
+            } else {
+                plugin.getAccounts().getAccount(Bukkit.getOfflinePlayer(args[0])).thenAccept(account -> {
+                    if (account == null) {
+                        sender.sendMessage("§cThe account was not found!");
+                    } else {
+                        sender.sendMessage(plugin.getMessages().getMoneyPlayer()
+                                .replace("%money%", plugin.getFormatter().formatCurrency(account.getBalance()))
+                                .replace("%name%", account.getName()));
+                    }
+                });
             }
         }
         return false;

@@ -1,9 +1,9 @@
 package ro.fr33styler.frconomy.account;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
 
+import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
@@ -12,53 +12,65 @@ import ro.fr33styler.frconomy.FrConomy;
 public class Accounts {
 
     private final FrConomy plugin;
-    private final Map<UUID, Account> cached = new HashMap<>();
+    private final Map<UUID, Account> cached = new LinkedHashMap<>();
 
     public Accounts(FrConomy plugin) {
         this.plugin = plugin;
     }
 
     public void add(Player player) {
-        Account account = new Account(player.getUniqueId(), player.getName());
-        account.setBalance(plugin.getSettings().getDefaultMoney());
-        cached.put(player.getUniqueId(), account);
-        plugin.getSQLDatabase().getAccount(account, () -> plugin.getSQLDatabase().createAccount(account));
+        Account account = getCachedAccount(player);
+        if (account == null) {
+            account = new Account(player.getUniqueId(), player.getName());
+            account.setBalance(plugin.getSettings().getDefaultMoney());
+            cached.put(player.getUniqueId(), account);
+
+            plugin.getSQLDatabase().synchronizeOrInsertAccount(account);
+        } else {
+            account.setEliminationCountdown(0);
+        }
     }
 
     public void remove(Player player) {
-        Account account = cached.remove(player.getUniqueId());
-        if (account != null) {
-            plugin.getSQLDatabase().updateAccount(account);
-        }
+        cached.remove(player.getUniqueId());
     }
 
-    public boolean createAccount(OfflinePlayer player) {
+    public Account getCachedAccount(OfflinePlayer player) {
+        return cached.get(player.getUniqueId());
+    }
+
+    public CompletableFuture<Account> getAccount(OfflinePlayer player) {
         Account account = cached.get(player.getUniqueId());
-        if (account == null) {
-            account = new Account(player);
-            account.setBalance(plugin.getSettings().getDefaultMoney());
-            if (!plugin.getSQLDatabase().hasAccount(account)) {
-                return plugin.getSQLDatabase().createAccount(account);
+
+        if (account == null || !account.isLoaded()) {
+            CompletableFuture<Account> futureAccount = plugin.getSQLDatabase().getAccount(player);
+            futureAccount.thenAccept(newAccount -> Bukkit.getScheduler().runTask(plugin, () -> {
+                cached.put(newAccount.getUUID(), newAccount);
+                if (!player.isOnline()) newAccount.setEliminationCountdown(20);
+            }));
+
+            Account newAccount = new Account(player.getUniqueId(), player.getName());
+            newAccount.setEliminationCountdown(20);
+            cached.put(player.getUniqueId(), newAccount);
+
+            return futureAccount;
+        }
+
+        return CompletableFuture.completedFuture(account);
+    }
+
+    public void tick() {
+        Iterator<Account> iterator = cached.values().iterator();
+        while (iterator.hasNext()) {
+            Account account = iterator.next();
+            if (Bukkit.getPlayer(account.getUUID()) == null) {
+                if (account.getEliminationCountdown() > 0) {
+                    account.setEliminationCountdown(account.getEliminationCountdown() - 1);
+                } else {
+                    iterator.remove();
+                }
             }
         }
-        return false;
-    }
-
-    public Account getAccount(OfflinePlayer player) {
-        Account account = cached.get(player.getUniqueId());
-        if (account == null) {
-            account = new Account(player);
-            plugin.getSQLDatabase().getAccount(account);
-        }
-        return account;
-    }
-
-    public boolean hasAccount(OfflinePlayer player) {
-        Account account = cached.get(player.getUniqueId());
-        if (account == null) {
-            return plugin.getSQLDatabase().hasAccount(new Account(player));
-        }
-        return true;
     }
 
 }

@@ -9,6 +9,7 @@ public class Settings {
     private final boolean shortScaleNotation;
     private final boolean payRequireConfirmation;
     private final boolean commasForGrouping;
+    private final String vaultMethod;
 
     public Settings(ConfigurationSection section) {
         defaultMoney = section.getDouble("default-money");
@@ -16,6 +17,7 @@ public class Settings {
         shortScaleNotation = section.getBoolean("short-scale-notation");
         payRequireConfirmation = section.getBoolean("pay-require-confirmation");
         commasForGrouping = section.getBoolean("commas-for-grouping");
+        vaultMethod = section.getString("vault-method");
     }
 
     public double getDefaultMoney() {
@@ -38,4 +40,7 @@ public class Settings {
         return commasForGrouping;
     }
 
+    public String getVaultMethod() {
+        return vaultMethod;
+    }
 }

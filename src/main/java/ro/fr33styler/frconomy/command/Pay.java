@@ -3,20 +3,21 @@ package ro.fr33styler.frconomy.command;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
+import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 
 import ro.fr33styler.frconomy.FrConomy;
 import ro.fr33styler.frconomy.account.Account;
 import ro.fr33styler.frconomy.util.ShortScaleUtil;
-import ro.fr33styler.frconomy.util.FrCommand;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-public class Pay implements FrCommand {
+public class Pay implements CommandExecutor, TabCompleter {
 
     private final FrConomy plugin;
 
@@ -25,59 +26,76 @@ public class Pay implements FrCommand {
     }
 
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String name, String[] args) {
-        if (!sender.hasPermission("frconomy.pay")) {
-            sender.sendMessage(plugin.getMessages().getPermission());
-        } else if (sender == Bukkit.getConsoleSender()) {
-            sender.sendMessage("Can be used only by players!");
+    public boolean onCommand(CommandSender commandSender, Command command, String name, String[] args) {
+        if (!commandSender.hasPermission("frconomy.pay")) {
+            commandSender.sendMessage(plugin.getMessages().getPermission());
+        } else if (!(commandSender instanceof Player)) {
+            commandSender.sendMessage("Can be used only by players!");
         } else if (args.length != 2) {
-            sender.sendMessage("§cInvalid arguments! /pay <name> <amount>");
+            commandSender.sendMessage("§cInvalid arguments! /pay <name> <amount>");
         } else {
-            Player player = (Player) sender;
-            OfflinePlayer target = Bukkit.getOfflinePlayer(args[0]);
-            if (player.getUniqueId().equals(target.getUniqueId())) {
-                sender.sendMessage(plugin.getMessages().getMoneyYourself());
-            } else {
-                try {
-                    double amount = ShortScaleUtil.fromShortScaleNotation(args[1]);
-                    if (amount < 0) {
-                        sender.sendMessage(plugin.getMessages().getPositive());
-                    } else if (!plugin.getAccounts().hasAccount(target)) {
-                        sender.sendMessage(plugin.getMessages().getPayAccount());
-                    } else {
-                        Account playerAccount = plugin.getAccounts().getAccount(player);
-                        if (plugin.getSettings().hasPayRequireConfirmation() &&
-                                !Arrays.deepEquals(playerAccount.getConfirmation(), args)) {
-
-                            playerAccount.setConfirmation(args);
-                            String confirmationRequired = plugin.getMessages().getConfirmationRequired();
-                            confirmationRequired = confirmationRequired.replace("%money%", plugin.getFormatter().formatCurrency(amount));
-                            confirmationRequired = confirmationRequired.replace("%name%", target.getName());
-                            sender.sendMessage(confirmationRequired);
-                        } else if (playerAccount.getBalance() < amount) {
-                            sender.sendMessage(plugin.getMessages().getNotEnough());
-                        } else {
-                            playerAccount.setConfirmation(null);
-                            Account targetAccount = plugin.getAccounts().getAccount(target);
-                            playerAccount.setBalance(playerAccount.getBalance() - amount);
-                            targetAccount.setBalance(targetAccount.getBalance() + amount);
-                            String sentTo = plugin.getMessages().getSentTo();
-                            sentTo = sentTo.replace("%money%", plugin.getFormatter().formatCurrency(amount));
-                            sentTo = sentTo.replace("%name%", target.getName());
-                            sender.sendMessage(sentTo);
-                            if (target.isOnline()) {
-                                String receivedFrom = plugin.getMessages().getReceivedFrom();
-                                receivedFrom = receivedFrom.replace("%money%", plugin.getFormatter().formatCurrency(amount));
-                                receivedFrom = receivedFrom.replace("%name%", player.getName());
-                                ((Player) target).sendMessage(receivedFrom);
-                            }
-                            return true;
-                        }
-                    }
-                } catch (NumberFormatException e) {
-                    sender.sendMessage(plugin.getMessages().getPayNotNumber());
-                }
+            Player sender = (Player) commandSender;
+            OfflinePlayer receiver = Bukkit.getOfflinePlayer(args[0]);
+            if (sender.getUniqueId().equals(receiver.getUniqueId())) {
+                commandSender.sendMessage(plugin.getMessages().getMoneyYourself());
+                return false;
             }
+
+            double amount;
+            
+            try {
+                amount = ShortScaleUtil.fromShortScaleNotation(args[1]);
+            } catch (NumberFormatException ignored) {
+                commandSender.sendMessage(plugin.getMessages().getPayNotNumber());
+                return false;
+            }
+
+            if (amount <= 0) {
+                commandSender.sendMessage(plugin.getMessages().getPositive());
+                return false;
+            }
+
+            Account senderAccount = plugin.getAccounts().getCachedAccount(sender);
+            if (senderAccount == null || senderAccount.isLoaded()) {
+                commandSender.sendMessage(plugin.getMessages().getAccountNotLoaded());
+                return false;
+            }
+
+            if (senderAccount.getBalance() < amount) {
+                commandSender.sendMessage(plugin.getMessages().getNotEnough());
+                return false;
+            }
+
+            plugin.getAccounts().getAccount(receiver).thenAccept(receiverAccount -> {
+                if (receiverAccount == null) {
+                    commandSender.sendMessage(plugin.getMessages().getPayAccount());
+                    return;
+                }
+                if (plugin.getSettings().hasPayRequireConfirmation() && !Arrays.deepEquals(receiverAccount.getConfirmation(), args)) {
+                    receiverAccount.setConfirmation(args);
+                    commandSender.sendMessage(plugin.getMessages().getConfirmationRequired()
+                            .replace("%money%", plugin.getFormatter().formatCurrency(amount))
+                            .replace("%name%", receiver.getName()));
+                } else {
+                    receiverAccount.setConfirmation(null);
+
+                    Bukkit.getScheduler().runTask(plugin, () -> {
+                        senderAccount.setBalance(senderAccount.getBalance() - amount);
+                        receiverAccount.setBalance(receiverAccount.getBalance() + amount);
+                        plugin.getSQLDatabase().updateAccount(senderAccount);
+                        plugin.getSQLDatabase().updateAccount(receiverAccount);
+
+                        commandSender.sendMessage(plugin.getMessages().getSentTo()
+                                .replace("%money%", plugin.getFormatter().formatCurrency(amount))
+                                .replace("%name%", receiver.getName()));
+                        if (receiver.isOnline()) {
+                            receiver.getPlayer().sendMessage(plugin.getMessages().getReceivedFrom()
+                                    .replace("%money%", plugin.getFormatter().formatCurrency(amount))
+                                    .replace("%name%", sender.getName()));
+                        }
+                    });
+                }
+            });
         }
         return false;
     }
