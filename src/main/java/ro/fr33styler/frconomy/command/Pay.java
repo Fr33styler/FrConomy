@@ -56,7 +56,7 @@ public class Pay implements CommandExecutor, TabCompleter {
             }
 
             Account senderAccount = plugin.getAccounts().getCachedAccount(sender);
-            if (senderAccount == null || senderAccount.isLoaded()) {
+            if (senderAccount == null || !senderAccount.isLoaded()) {
                 commandSender.sendMessage(plugin.getMessages().getAccountNotLoaded());
                 return false;
             }
