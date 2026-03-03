@@ -11,6 +11,7 @@ import java.util.concurrent.ExecutionException;
 public class BlockingVault extends AbstractEconomy {
 
     private final EconomyResponse notLoadedResponse;
+    private final EconomyResponse notValidResponse;
     private final EconomyResponse depositNegativeResponse;
     private final EconomyResponse withdrawNegativeResponse;
     private final EconomyResponse insufficientFundsResponse;
@@ -20,6 +21,8 @@ public class BlockingVault extends AbstractEconomy {
 
         notLoadedResponse = new EconomyResponse(0, 0,
                 EconomyResponse.ResponseType.FAILURE, plugin.getMessages().getAccountNotLoaded());
+        notValidResponse = new EconomyResponse(0, 0,
+                EconomyResponse.ResponseType.FAILURE, plugin.getMessages().getAccountNotValid());
         depositNegativeResponse = new EconomyResponse(0, 0,
                 EconomyResponse.ResponseType.FAILURE, plugin.getMessages().getDepositNegative());
         withdrawNegativeResponse = new EconomyResponse(0, 0,
@@ -47,7 +50,7 @@ public class BlockingVault extends AbstractEconomy {
         } catch (InterruptedException | ExecutionException exception) {
             return notLoadedResponse;
         }
-        if (account == null) return notLoadedResponse;
+        if (account == null) return notValidResponse;
 
         if (account.getBalance() >= amount) {
             account.setBalance(account.getBalance() - amount);
@@ -87,7 +90,7 @@ public class BlockingVault extends AbstractEconomy {
         } catch (InterruptedException | ExecutionException exception) {
             return notLoadedResponse;
         }
-        if (account == null) return notLoadedResponse;
+        if (account == null) return notValidResponse;
 
         account.setBalance(account.getBalance() + amount);
         plugin.getSQLDatabase().updateAccount(account);
@@ -112,6 +115,7 @@ public class BlockingVault extends AbstractEconomy {
         } catch (InterruptedException | ExecutionException exception) {
             return 0;
         }
+        if (account == null) return 0;
 
         return account.getBalance();
     }
@@ -139,6 +143,7 @@ public class BlockingVault extends AbstractEconomy {
         } catch (InterruptedException | ExecutionException exception) {
             return false;
         }
+        if (account == null) return false;
 
         return account.getBalance() >= amount;
     }

@@ -59,7 +59,7 @@ public class Accounts {
         return CompletableFuture.completedFuture(account);
     }
 
-    public void tick() {
+    public void run() {
         Iterator<Account> iterator = cached.values().iterator();
         while (iterator.hasNext()) {
             Account account = iterator.next();

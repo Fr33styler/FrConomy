@@ -28,7 +28,7 @@ public class Messages {
     private final String payAmountArgument;
     private final String accountNotLoaded;
     private final String accountIsLoading;
-    private final String payAccount;
+    private final String accountNotValid;
     private final String payNotNumber;
     private final String moneyYourself;
     private final String topAggregatedMoney;
@@ -53,7 +53,7 @@ public class Messages {
         payAmountArgument = get(section, "pay-amount-argument");
         accountNotLoaded = get(section, "account-not-loaded");
         accountIsLoading = get(section, "account-is-loading");
-        payAccount = get(section, "pay-account");
+        accountNotValid = get(section, "account-not-valid");
         payNotNumber = get(section, "pay-not-number");
         top = get(section, "top");
         topRank = get(section, "top-rank");
@@ -159,8 +159,8 @@ public class Messages {
         return accountIsLoading;
     }
 
-    public String getPayAccount() {
-        return payAccount;
+    public String getAccountNotValid() {
+        return accountNotValid;
     }
 
     public String getPayNotNumber() {

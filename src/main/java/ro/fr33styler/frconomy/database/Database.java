@@ -1,6 +1,5 @@
 package ro.fr33styler.frconomy.database;
 
-import org.bukkit.OfflinePlayer;
 import ro.fr33styler.frconomy.account.Account;
 import ro.fr33styler.frconomy.database.mysql.MySQL;
 import ro.fr33styler.frconomy.util.TopBalance;

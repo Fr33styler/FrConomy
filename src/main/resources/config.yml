@@ -56,7 +56,7 @@ messages:
   pay-amount-argument: '<amount>'
   account-not-loaded: '&cThe account isn''t loaded!'
   account-is-loading: '&cThe account isn''t loaded yet, please wait a moment!'
-  pay-account: '&cThe account doesn''t exists!'
+  account-not-valid: '&cThe account doesn''t exists!'
   pay-not-number: '&cThe amount must be a number!'
   top: '&2[&fMoney&2] Top Money'
   top-rank: '  &e%rank%. &2%name%: &f%money%'

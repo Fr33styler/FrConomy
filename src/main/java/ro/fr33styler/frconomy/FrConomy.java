@@ -85,7 +85,7 @@ public class FrConomy extends JavaPlugin {
         registerCommand("balTop", new Top(this));
         registerCommand("money", new Money(this));
 
-        updateTask = Bukkit.getScheduler().runTaskTimer(this, accounts::tick, 0, 1);
+        updateTask = Bukkit.getScheduler().runTaskTimer(this, accounts::run, 0, 20);
 
         Bukkit.getOnlinePlayers().forEach(accounts::add);
         console.sendMessage("§a" + getName() + " has been loaded!");
