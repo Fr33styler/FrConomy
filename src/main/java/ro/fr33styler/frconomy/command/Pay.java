@@ -66,7 +66,7 @@ public class Pay implements CommandExecutor, TabCompleter {
                 return false;
             }
 
-            plugin.getAccounts().getAccount(receiver).thenAccept(receiverAccount -> {
+            plugin.getAccounts().loadAccount(receiver).thenAccept(receiverAccount -> {
                 if (receiverAccount == null) {
                     commandSender.sendMessage(plugin.getMessages().getAccountNotValid());
                     return;

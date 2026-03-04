@@ -42,7 +42,7 @@ public class ConfirmVault extends AbstractEconomy {
         Account account = plugin.getAccounts().getCachedAccount(player);
 
         if (account == null) {
-            plugin.getAccounts().getAccount(player);
+            plugin.getAccounts().loadAccount(player);
             return isLoadingResponse;
         } else if (!account.isLoaded()) {
             return isLoadingResponse;
@@ -82,7 +82,7 @@ public class ConfirmVault extends AbstractEconomy {
         Account account = plugin.getAccounts().getCachedAccount(player);
 
         if (account == null) {
-            plugin.getAccounts().getAccount(player);
+            plugin.getAccounts().loadAccount(player);
             return isLoadingResponse;
         } else if (!account.isLoaded()) {
             return isLoadingResponse;
@@ -108,7 +108,7 @@ public class ConfirmVault extends AbstractEconomy {
         Account account = plugin.getAccounts().getCachedAccount(player);
 
         if (account == null) {
-            plugin.getAccounts().getAccount(player);
+            plugin.getAccounts().loadAccount(player);
             return 0;
         } else if (!account.isLoaded()) {
             return 0;
@@ -137,7 +137,7 @@ public class ConfirmVault extends AbstractEconomy {
         Account account = plugin.getAccounts().getCachedAccount(player);
 
         if (account == null) {
-            plugin.getAccounts().getAccount(player);
+            plugin.getAccounts().loadAccount(player);
             return false;
         } else if (!account.isLoaded()) {
             return false;
@@ -166,7 +166,7 @@ public class ConfirmVault extends AbstractEconomy {
         Account account = plugin.getAccounts().getCachedAccount(player);
 
         if (account == null) {
-            plugin.getAccounts().getAccount(player);
+            plugin.getAccounts().loadAccount(player);
             return false;
         } else return account.isLoaded();
     }

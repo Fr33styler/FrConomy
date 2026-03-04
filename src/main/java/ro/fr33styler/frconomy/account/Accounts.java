@@ -19,7 +19,7 @@ public class Accounts {
     }
 
     public void add(Player player) {
-        Account account = getCachedAccount(player);
+        Account account = cached.get(player.getUniqueId());
         if (account == null) {
             account = new Account(player.getUniqueId(), player.getName());
             account.setBalance(plugin.getSettings().getDefaultMoney());
@@ -39,7 +39,7 @@ public class Accounts {
         return cached.get(player.getUniqueId());
     }
 
-    public CompletableFuture<Account> getAccount(OfflinePlayer player) {
+    public CompletableFuture<Account> loadAccount(OfflinePlayer player) {
         Account account = cached.get(player.getUniqueId());
 
         if (account == null) {

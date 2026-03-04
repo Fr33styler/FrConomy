@@ -46,7 +46,7 @@ public class BlockingVault extends AbstractEconomy {
         if (amount < 0) return withdrawNegativeResponse;
         Account account;
         try {
-            account = plugin.getAccounts().getAccount(player).get();
+            account = plugin.getAccounts().loadAccount(player).get();
         } catch (InterruptedException | ExecutionException exception) {
             return notLoadedResponse;
         }
@@ -86,7 +86,7 @@ public class BlockingVault extends AbstractEconomy {
 
         Account account;
         try {
-            account = plugin.getAccounts().getAccount(player).get();
+            account = plugin.getAccounts().loadAccount(player).get();
         } catch (InterruptedException | ExecutionException exception) {
             return notLoadedResponse;
         }
@@ -111,7 +111,7 @@ public class BlockingVault extends AbstractEconomy {
     public double getBalance(OfflinePlayer player) {
         Account account;
         try {
-            account = plugin.getAccounts().getAccount(player).get();
+            account = plugin.getAccounts().loadAccount(player).get();
         } catch (InterruptedException | ExecutionException exception) {
             return 0;
         }
@@ -139,7 +139,7 @@ public class BlockingVault extends AbstractEconomy {
     public boolean has(OfflinePlayer player, double amount) {
         Account account;
         try {
-            account = plugin.getAccounts().getAccount(player).get();
+            account = plugin.getAccounts().loadAccount(player).get();
         } catch (InterruptedException | ExecutionException exception) {
             return false;
         }
@@ -167,7 +167,7 @@ public class BlockingVault extends AbstractEconomy {
     public boolean hasAccount(OfflinePlayer player) {
         Account account;
         try {
-            account = plugin.getAccounts().getAccount(player).get();
+            account = plugin.getAccounts().loadAccount(player).get();
         } catch (InterruptedException | ExecutionException exception) {
             return false;
         }

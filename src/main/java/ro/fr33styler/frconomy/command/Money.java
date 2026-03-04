@@ -43,7 +43,7 @@ public class Money implements CommandExecutor, TabCompleter {
             if (!sender.hasPermission("frconomy.money.name")) {
                 sender.sendMessage(plugin.getMessages().getPermission());
             } else {
-                plugin.getAccounts().getAccount(Bukkit.getOfflinePlayer(args[0])).thenAccept(account -> {
+                plugin.getAccounts().loadAccount(Bukkit.getOfflinePlayer(args[0])).thenAccept(account -> {
                     if (account == null) {
                         sender.sendMessage("§cThe account was not found!");
                     } else {

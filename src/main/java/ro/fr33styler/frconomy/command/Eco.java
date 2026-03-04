@@ -88,7 +88,7 @@ public class Eco implements CommandExecutor, TabCompleter {
     }
 
     private void performOperation(CommandSender sender, String argument, OfflinePlayer target, double amount) {
-        plugin.getAccounts().getAccount(target).thenAccept(account -> {
+        plugin.getAccounts().loadAccount(target).thenAccept(account -> {
             if (account == null) {
                 sender.sendMessage("§cThe account doesn't exists!");
                 return;
