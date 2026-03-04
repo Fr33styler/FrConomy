@@ -25,9 +25,7 @@ public class Money implements CommandExecutor, TabCompleter {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String name, String[] args) {
         if (args.length == 0) {
-            if (sender.hasPermission("frconomy.money")) {
-                sender.sendMessage(plugin.getMessages().getPermission());
-            } else if (!(sender instanceof Player)) {
+            if (!(sender instanceof Player)) {
                 sender.sendMessage("§cInvalid arguments! Please use /money <name>");
             } else {
                 Account account = plugin.getAccounts().getCachedAccount((Player) sender);
