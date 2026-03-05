@@ -71,6 +71,10 @@ public class Pay implements CommandExecutor, TabCompleter {
                     commandSender.sendMessage(plugin.getMessages().getAccountNotValid());
                     return;
                 }
+                if (!receiverAccount.isLoaded()) {
+                    commandSender.sendMessage(plugin.getMessages().getAccountNotLoaded());
+                    return;
+                }
                 if (plugin.getSettings().hasPayRequireConfirmation() && !Arrays.deepEquals(receiverAccount.getConfirmation(), args)) {
                     receiverAccount.setConfirmation(args);
                     commandSender.sendMessage(plugin.getMessages().getConfirmationRequired()

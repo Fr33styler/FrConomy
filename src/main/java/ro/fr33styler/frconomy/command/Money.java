@@ -44,6 +44,8 @@ public class Money implements CommandExecutor, TabCompleter {
                 plugin.getAccounts().loadAccount(Bukkit.getOfflinePlayer(args[0])).thenAccept(account -> {
                     if (account == null) {
                         sender.sendMessage("§cThe account was not found!");
+                    } else if (!account.isLoaded()) {
+                        sender.sendMessage(plugin.getMessages().getAccountNotLoaded());
                     } else {
                         sender.sendMessage(plugin.getMessages().getMoneyPlayer()
                                 .replace("%money%", plugin.getFormatter().formatCurrency(account.getBalance()))
