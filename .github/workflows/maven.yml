@@ -30,9 +30,10 @@ jobs:
     - name: Build with Maven
       run: mvn -B package --file pom.xml
     - run: mkdir staging && cp target/FrConomy*.jar staging
-    - uses: actions/upload-artifact@v4
+    - uses: actions/upload-artifact@v7
       with:
         name: Package
+        archive: false
         path: staging
 
     # Optional: Uploads the full dependency graph to GitHub to improve the quality of Dependabot alerts this repository can receive
