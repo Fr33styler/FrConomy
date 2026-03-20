@@ -4,7 +4,7 @@
 
     <groupId>ro.fr33styler.minecraft</groupId>
     <artifactId>frConomy</artifactId>
-    <version>1.20.0</version>
+    <version>1.20.1-SNAPSHOT</version>
 
     <properties>
         <plugin.name>FrConomy</plugin.name>
